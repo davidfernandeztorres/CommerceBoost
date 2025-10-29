@@ -1,0 +1,18 @@
+﻿<Window x:Class="CommerceBoost.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="CommerceBoost - Gestión de Comercio" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="POS" Click="MenuItem_Click" Tag="index.html"/>
+            <MenuItem Header="Inventario" Click="MenuItem_Click" Tag="inventory.html"/>
+            <MenuItem Header="Ventas" Click="MenuItem_Click" Tag="sales.html"/>
+        </Menu>
+        <wv2:WebView2 x:Name="webView" Grid.Row="1" />
+    </Grid>
+</Window>
