@@ -1,0 +1,14 @@
+{
+  "TicketId": 8,
+  "Fecha": "2025-11-28T11:56:29.3796033Z",
+  "Total": 0,
+  "MetodoPago": "Sin Ticket",
+  "Items": [
+    {
+      "Nombre": "Producto Nuevo 39",
+      "Quantity": 1,
+      "UnitPrice": 47.19,
+      "TotalPrice": 47.19
+    }
+  ]
+}

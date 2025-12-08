@@ -1,59 +1,72 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CommerceBoost - POS</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <title>CommerceBoost TPV</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="container-fluid">
-        <h1 class="text-center mb-4">Tienda de Disfraces - POS</h1>
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card p-3 mb-3">
-                    <h5>Carrito de Compras</h5>
-                    <div id="cart" class="list-group mb-3" style="max-height: 400px; overflow-y: auto;">
-                        <!-- Items will be added here -->
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <strong>Total: $<span id="total">0.00</span></strong>
-                        <button class="btn btn-success" onclick="checkout()">Cobrar</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card p-3 mb-3">
-                    <h5>Escáner de Código</h5>
-                    <button class="btn btn-primary btn-lg mb-3" onclick="simulateScan()">Escanear Producto</button>
-                    <input type="text" id="manualCode" placeholder="Código manual" class="form-control mb-2">
-                    <button class="btn btn-secondary" onclick="addByCode()">Agregar por Código</button>
-                </div>
-                <div class="card p-3">
-                    <h5>Pad Numérico</h5>
-                    <div class="mb-2">
-                        <span id="selectedDisplay">Selecciona un artículo para editar cantidad</span>
-                    </div>
-                    <div class="row g-1">
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('1')">1</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('2')">2</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('3')">3</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('4')">4</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('5')">5</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('6')">6</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('7')">7</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('8')">8</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('9')">9</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="appendNumber('0')">0</button></div>
-                        <div class="col-4"><button class="btn btn-outline-secondary w-100" onclick="clearQuantity()">C</button></div>
-                        <div class="col-4"><button class="btn btn-danger w-100" onclick="removeSelected()">X</button></div>
-                    </div>
-                </div>
+    <div id="app">
+
+        <header>
+            <img src="logo-placeholder.png" alt="CommerceBoost Logo">
+        </header>
+
+        <main>
+            <table id="productsTable">
+                <thead>
+                    <tr>
+                        <th>REF</th>
+                        <th>NOMBRE</th>
+                        <th>PRECIO SIN IVA</th>
+                        <th>IVA</th>
+                        <th>PRECIO TOTAL</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" value="001" readonly></td>
+                        <td><input type="text" value="Producto A" readonly></td>
+                        <td><input type="number" value="10.00" readonly></td>
+                        <td><input type="number" value="21" readonly></td>
+                        <td><input type="number" value="12.10" readonly></td>
+                        <td><button class="deleteRow">❌</button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </main>
+
+        <div class="sidebar">
+            <button id="btnInventory">📦 Inventario</button>
+            <button id="btnSales">💰 Ventas</button>
+            <button id="btnSettings">⚙ Ajustes</button>
+
+            <div class="numeric-pad">
+                <button>7</button><button>8</button><button>9</button>
+                <button>4</button><button>5</button><button>6</button>
+                <button>1</button><button>2</button><button>3</button>
+                <button>0</button><button>.</button><button>⌫</button>
             </div>
         </div>
+
+        <footer>
+            <button data-action="pay_cash">Cobrar directo</button>
+            <button data-action="pay_no_ticket">Cobrar sin ticket</button>
+            <button data-action="pay_card">Cobrar tarjeta</button>
+            <button data-action="reprint">Reimprimir ticket</button>
+            <button data-action="split">Dividir ticket</button>
+            <button data-action="discount">Descuento</button>
+            <button data-action="delete_item">Borrar artículo</button>
+            <button data-action="add_item">Añadir artículo</button>
+            <button data-action="more_options">Más opciones</button>
+        </footer>
+
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="index.js"></script>
 </body>
+
 </html>

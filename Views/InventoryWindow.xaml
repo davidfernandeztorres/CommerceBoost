@@ -1,0 +1,124 @@
+<Window x:Class="CommerceBoost.Views.InventoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gestión de Inventario" Height="600" Width="900"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F1F5F9">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Gestión de Inventario" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" Foreground="#1E293B"/>
+
+        <!-- Scanner Simulation and CRUD for Inventory -->
+        <Border Grid.Row="1" Background="White" Padding="15" CornerRadius="8" Margin="0,0,0,20" BorderBrush="#E2E8F0" BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="Gestión de Stock" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <!-- Search -->
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                             Width="200" Height="35" VerticalContentAlignment="Center" Padding="5,0" Margin="0,0,10,0"
+                             BorderBrush="#E5E7EB" BorderThickness="1"/>
+                    <Button Content="🔍 Buscar" Command="{Binding SearchProductCommand}" Style="{StaticResource FooterButtonStyle}" Height="35" Padding="15,0" Margin="0,0,20,0"/>
+
+                    <!-- Scan New -->
+                    <Button Content="➕ Añadir Manual" 
+                            Command="{Binding AddManualProductCommand}"
+                            Background="#10B981" 
+                            Foreground="White"
+                            Padding="15,0"
+                            Height="35"
+                            FontWeight="SemiBold"
+                            BorderThickness="0"
+                            Margin="0,0,10,0">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+
+                    <Button Content="📦 Escanear Nuevo" 
+                            Command="{Binding ScanNewProductCommand}"
+                            Background="#1E3A8A" 
+                            Foreground="White"
+                            Padding="15,0"
+                            Height="35"
+                            FontWeight="SemiBold"
+                            BorderThickness="0"
+                            Margin="0,0,20,0">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+
+                    <!-- CRUD -->
+                    <Button Content="✏ Editar" Command="{Binding EditProductCommand}" 
+                            CommandParameter="{Binding SelectedItem, ElementName=InventoryGrid}"
+                            Background="#F59E0B" Foreground="White" Height="35" Padding="15,0" FontWeight="SemiBold" BorderThickness="0" Margin="0,0,10,0">
+                         <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button Content="🗑 Eliminar" Command="{Binding DeleteProductCommand}" 
+                            CommandParameter="{Binding SelectedItem, ElementName=InventoryGrid}"
+                            Background="#EF4444" Foreground="White" Height="35" Padding="15,0" FontWeight="SemiBold" BorderThickness="0">
+                         <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Inventory Grid -->
+        <DataGrid Grid.Row="2" x:Name="InventoryGrid"
+                  ItemsSource="{Binding ProductsView}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  Background="White"
+                  BorderBrush="#E5E7EB"
+                  BorderThickness="1"
+                  RowHeight="45"
+                  FontSize="14">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="CÓDIGO" Binding="{Binding Codigo}" Width="120" IsReadOnly="True"/>
+                <DataGridTextColumn Header="NOMBRE" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
+                <DataGridTextColumn Header="PRECIO" Binding="{Binding Precio, StringFormat=C2}" Width="100"/>
+                <DataGridTextColumn Header="STOCK" Binding="{Binding Stock}" Width="100"/>
+            </DataGrid.Columns>
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#F9FAFB"/>
+                    <Setter Property="Foreground" Value="#6B7280"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Padding" Value="12,8"/>
+                    <Setter Property="BorderBrush" Value="#E5E7EB"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+        </DataGrid>
+
+        <!-- Close Button -->
+        <Button Grid.Row="3" Content="Cerrar" IsCancel="True" Margin="0,20,0,0" HorizontalAlignment="Right" Padding="20,10" Background="#64748B" Foreground="White" FontWeight="SemiBold" BorderThickness="0">
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="6"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+    </Grid>
+</Window>

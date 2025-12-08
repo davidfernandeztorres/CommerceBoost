@@ -1,17 +1,15 @@
-using CommerceBoost.Models;
 using Microsoft.EntityFrameworkCore;
+using CommerceBoost.Models;
 
-namespace CommerceBoost.Data;
-
-public class ContextoComercio : DbContext
+namespace CommerceBoost.Data
 {
-    public DbSet<Producto> Productos { get; set; }
-    public DbSet<Venta> Ventas { get; set; }
-    public DbSet<LineaVenta> LineasVenta { get; set; }
-    public DbSet<Cliente> Clientes { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public class CommerceDbContext : DbContext
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5433;Database=commerce;Username=postgres;Password=password");
+        public CommerceDbContext(DbContextOptions<CommerceDbContext> options) : base(options) { }
+
+        public DbSet<Customer> Customers => Set<Customer>();
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<Sale> Sales => Set<Sale>();
+        public DbSet<SaleItem> SaleItems => Set<SaleItem>();
     }
 }

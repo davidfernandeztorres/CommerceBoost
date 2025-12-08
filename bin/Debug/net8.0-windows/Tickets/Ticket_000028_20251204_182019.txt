@@ -1,0 +1,28 @@
+========================================
+     O ALMACEN DO CARNAVAL
+========================================
+
+Ticket #: 000028
+Fecha: 04/12/2025 18:20:19
+Método de Pago: EFECTIVO
+----------------------------------------
+
+CANT  PRODUCTO              P.UNIT  TOTAL
+----------------------------------------
+   1  Producto Nuevo 1       26,96   26,96
+   1  Producto Nuevo 46      32,91   32,91
+   1  Producto Nuevo 39      47,19   47,19
+   1  Producto Nuevo 21      42,58   42,58
+   1  Producto Nuevo 29      30,15   30,15
+   1  Producto Nuevo 29      30,15   30,15
+   1  Producto Nuevo 97      31,17   31,17
+----------------------------------------
+
+TOTAL:                         241,11€
+
+*** PAGADO EN EFECTIVO ***
+
+========================================
+   ¡Gracias por su compra!
+   Vuelva pronto
+========================================

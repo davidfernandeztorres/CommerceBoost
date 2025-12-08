@@ -1,46 +1,66 @@
-﻿using System.IO;
+﻿
+using System;
 using System.Windows;
-using Microsoft.Web.WebView2.Core;
-using CommerceBoost.Services;
-using CommerceBoost.Data;
-using System.Windows.Controls;
+using CommerceBoost.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace CommerceBoost;
-
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow : Window
+namespace CommerceBoost
 {
-    public MainWindow()
+    public partial class MainWindow : Window
     {
-        InitializeComponent();
-        // DataContext = ViewModel;
-        InitializeWebView();
-    }
+        private readonly SalesViewModel _vm;
 
-    private async void InitializeWebView()
-    {
-        try
+        public MainWindow(SalesViewModel vm)
         {
-            await webView.EnsureCoreWebView2Async(null);
-            webView.CoreWebView2.Navigate(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "index.html"));
+            _vm = vm;
+            InitializeComponent();
+            DataContext = _vm;
+
+            // Subscribe to navigation requests
+            // Subscribe to navigation requests
+            _vm.RequestNavigation += OnNavigate;
             
-            // Exponer servicio C# al JavaScript
-            webView.CoreWebView2.AddHostObjectToScript("ServicioComercio", new ServicioComercio(new ContextoComercio()));
+            // Subscribe to DataGrid cell changes
+            SalesGrid.CurrentCellChanged += SalesGrid_CurrentCellChanged;
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error initializing WebView2: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
 
-    private void MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem menuItem && menuItem.Tag is string htmlFile)
+        private void SalesGrid_CurrentCellChanged(object? sender, EventArgs e)
         {
-            string path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", htmlFile);
-            webView.CoreWebView2.Navigate(path);
+            if (SalesGrid.CurrentCell.Column != null)
+            {
+                string? header = SalesGrid.CurrentCell.Column.Header as string;
+                if (header == "PRECIO UNIT.")
+                {
+                    _vm.EditingProperty = "UnitPrice";
+                }
+                else
+                {
+                    _vm.EditingProperty = "Quantity";
+                }
+            }
+        }
+
+        private void OnNavigate(string viewName)
+        {
+            switch (viewName)
+            {
+                case "Sales":
+                    // Open Sales Management Window
+                    _vm.RefreshSalesStats();
+                    var salesWin = new Views.SalesManagementWindow(_vm);
+                    salesWin.Owner = this;
+                    salesWin.ShowDialog();
+                    break;
+                case "Inventory":
+                    // Open Inventory Window
+                    var invWin = new Views.InventoryWindow(_vm);
+                    invWin.Owner = this;
+                    invWin.ShowDialog();
+                    break;
+                case "Settings":
+                    MessageBox.Show("Vista de Ajustes no implementada aún.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+            }
         }
     }
 }

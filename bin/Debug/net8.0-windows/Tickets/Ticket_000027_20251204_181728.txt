@@ -1,0 +1,62 @@
+========================================
+     O ALMACEN DO CARNAVAL
+========================================
+
+Ticket #: 000027
+Fecha: 04/12/2025 18:17:28
+Método de Pago: EFECTIVO
+----------------------------------------
+
+CANT  PRODUCTO              P.UNIT  TOTAL
+----------------------------------------
+   8  Producto Nuevo 97      31,17  249,36
+   1  Producto Nuevo 97      31,17   31,17
+   1  Producto Nuevo 1       26,96   26,96
+   1  pelota                 25,00   25,00
+   1  Producto Nuevo 21      42,58   42,58
+   1  Producto Nuevo 1       26,96   26,96
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 97      31,17   31,17
+   1  Producto Nuevo 29      30,15   30,15
+   1  Producto Nuevo 39      47,19   47,19
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 21      42,58   42,58
+   1  Producto Nuevo 21      42,58   42,58
+   1  Producto Nuevo 97      31,17   31,17
+   1  Producto Nuevo 29      30,15   30,15
+   1  jarra                   5,00    5,00
+   1  Producto Nuevo 39      47,19   47,19
+   1  Producto Nuevo 99       7,07    7,07
+   1  Producto Nuevo 39      47,19   47,19
+   1  Producto Nuevo 1       26,96   26,96
+   1  Producto Nuevo 97      31,17   31,17
+   1  Producto Nuevo 29      30,15   30,15
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 99       7,07    7,07
+   1  Producto Nuevo 39      47,19   47,19
+   1  Producto Nuevo 29      30,15   30,15
+   1  Producto Nuevo 39      47,19   47,19
+   1  Producto Nuevo 1       26,96   26,96
+   1  Producto Nuevo 99       7,07    7,07
+   1  Producto Nuevo 46      32,91   32,91
+   1  Producto Nuevo 21      42,58   42,58
+   1  Producto Nuevo 97      31,17   31,17
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 99       7,07    7,07
+   1  Producto Nuevo 46      32,91   32,91
+   1  Producto Nuevo 24      42,26   42,26
+   1  Producto Nuevo 21      42,58   42,58
+----------------------------------------
+
+TOTAL:                        1586,94€
+
+*** PAGADO EN EFECTIVO ***
+
+========================================
+   ¡Gracias por su compra!
+   Vuelva pronto
+========================================

@@ -1,82 +1,128 @@
+using System;
 using CommerceBoost.Data;
 using CommerceBoost.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
 
-namespace CommerceBoost.Services;
-
-public class ServicioComercio
+namespace CommerceBoost.Services
 {
-    private readonly ContextoComercio _contexto;
-
-    public ServicioComercio(ContextoComercio contexto)
+    public class CommerceService
     {
-        _contexto = contexto;
-    }
+        private readonly CommerceDbContext _db;
 
-    public async Task<IEnumerable<Producto>> ObtenerProductosAsync()
-    {
-        return await _contexto.Productos.ToListAsync();
-    }
-
-    public async Task AgregarProductoAsync(string nombre, string codigo, decimal precio, int stock)
-    {
-        var producto = new Producto { Nombre = nombre, Codigo = codigo, Precio = precio, Stock = stock };
-        _contexto.Productos.Add(producto);
-        await _contexto.SaveChangesAsync();
-    }
-
-    public async Task<Producto?> ObtenerProductoPorCodigoAsync(string codigo)
-    {
-        return await _contexto.Productos.FirstOrDefaultAsync(p => p.Codigo == codigo);
-    }
-
-    public async Task ActualizarProductoAsync(int id, string nombre, string codigo, decimal precio, int stock)
-    {
-        var producto = await _contexto.Productos.FindAsync(id);
-        if (producto != null)
+        public CommerceService(CommerceDbContext db)
         {
-            producto.Nombre = nombre;
-            producto.Codigo = codigo;
-            producto.Precio = precio;
-            producto.Stock = stock;
-            await _contexto.SaveChangesAsync();
+            _db = db;
         }
-    }
 
-    public async Task EliminarProductoAsync(int id)
-    {
-        var producto = await _contexto.Productos.FindAsync(id);
-        if (producto != null)
+        public List<Sale> GetSales()
         {
-            _contexto.Productos.Remove(producto);
-            await _contexto.SaveChangesAsync();
+            return _db.Sales
+                .Include(s => s.Items)
+                .ThenInclude(i => i.Product)
+                .Include(s => s.Customer)
+                .ToList();
         }
-    }
 
-    public async Task<IEnumerable<Venta>> ObtenerVentasAsync()
-    {
-        return await _contexto.Ventas.Include(v => v.Lineas).ThenInclude(l => l.Producto).ToListAsync();
-    }
+        public List<Product> GetProducts()
+        {
+            return _db.Products.ToList();
+        }
 
-    public async Task AgregarVentaAsync(List<LineaVenta> lineas)
-    {
-        var venta = new Venta { Fecha = DateTime.Now, Lineas = lineas };
-        venta.Total = lineas.Sum(l => l.Cantidad * l.Precio);
-        _contexto.Ventas.Add(venta);
-        await _contexto.SaveChangesAsync();
-    }
+        public List<Customer> GetCustomers()
+        {
+            return _db.Customers.ToList();
+        }
 
-    public async Task<IEnumerable<Cliente>> ObtenerClientesAsync()
-    {
-        return await _contexto.Clientes.ToListAsync();
-    }
+        public void AddSale(Sale sale)
+        {
+            _db.Sales.Add(sale);
+            _db.SaveChanges();
+        }
 
-    public async Task AgregarClienteAsync(Cliente cliente)
-    {
-        _contexto.Clientes.Add(cliente);
-        await _contexto.SaveChangesAsync();
+        public void UpdateSales(List<Sale> sales)
+        {
+            _db.Sales.UpdateRange(sales);
+            _db.SaveChanges();
+        }
+
+        public void AddProduct(Product product)
+        {
+            _db.Products.Add(product);
+            _db.SaveChanges();
+        }
+
+        public void AddCustomer(Customer customer)
+        {
+            _db.Customers.Add(customer);
+            _db.SaveChanges();
+        }
+
+        public Product? GetProductByCode(string code)
+        {
+            return _db.Products.FirstOrDefault(p => p.Id.ToString() == code || p.Nombre == code);
+        }
+
+        public void UpdateSaleItem(SaleItem item)
+        {
+            _db.SaleItems.Update(item);
+            _db.SaveChanges();
+        }
+
+        public void DeleteSaleItem(int saleItemId)
+        {
+            var item = _db.SaleItems.Find(saleItemId);
+            if (item != null)
+            {
+                _db.SaleItems.Remove(item);
+                _db.SaveChanges();
+            }
+        }
+        
+        public void DeleteProduct(int productId)
+        {
+            var product = _db.Products.Find(productId);
+            if (product != null)
+            {
+                _db.Products.Remove(product);
+                _db.SaveChanges();
+            }
+        }
+        
+        public decimal GetDailyTotal(DateTime date)
+        {
+            return _db.Sales
+                .Where(s => s.Fecha.Date == date.Date)
+                .Sum(s => s.Total);
+        }
+        
+        public void UpdateStock(int productId, int quantitySold)
+        {
+            var product = _db.Products.Find(productId);
+            if (product != null)
+            {
+                product.Stock -= quantitySold;
+                _db.SaveChanges();
+            }
+        }
+        
+        public void EnsureSchema()
+        {
+            try
+            {
+                // Fix missing Discount column in SaleItems
+                _db.Database.ExecuteSqlRaw("ALTER TABLE \"SaleItems\" ADD COLUMN IF NOT EXISTS \"Discount\" numeric NOT NULL DEFAULT 0;");
+                
+                // Add MetodoPago and ZClosed columns to Sales
+                _db.Database.ExecuteSqlRaw("ALTER TABLE \"Sales\" ADD COLUMN IF NOT EXISTS \"MetodoPago\" text NOT NULL DEFAULT 'Efectivo';");
+                _db.Database.ExecuteSqlRaw("ALTER TABLE \"Sales\" ADD COLUMN IF NOT EXISTS \"ZClosed\" boolean NOT NULL DEFAULT false;");
+            }
+            catch (Exception ex)
+            {
+                // Log or handle schema update errors
+                System.Diagnostics.Debug.WriteLine($"Schema update error: {ex.Message}");
+            }
+        }
     }
 }

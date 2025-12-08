@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\david\Documents\GitHub\CommerceBoost\obj\Debug\net8.0-windows\
+C:\Users\david\Documents\GitHub\Pacticas\CommerceBoost\obj\Debug\net8.0-windows\
 CommerceBoost
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
-C:\Users\david\Documents\GitHub\CommerceBoost\App.xaml
-11407045341
-81852591190
-14-1743870916
-215438461898
-MainWindow.xaml;
+C:\Users\david\Documents\GitHub\Pacticas\CommerceBoost\App.xaml
+6990232109
+
+20-528495954
+232-1326904852
+MainWindow.xaml;Views\InputWindow.xaml;Views\InventoryView.xaml;Views\InventoryWindow.xaml;Views\ProductFormWindow.xaml;Views\SalesManagementWindow.xaml;
 
 False
 
