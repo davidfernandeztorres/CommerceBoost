@@ -31,11 +31,11 @@ namespace CommerceBoost.ViewModels
         public SalesViewModel(CommerceService service)
         {
             _service = service;
-            _service.EnsureSchema(); // Fix DB Schema
-            // Initialize with a new empty sale for the TPV session
+            _service.EnsureSchema(); // Arreglamos el esquema de la BD si hace falta
+            // Empezamos con una venta vacía para la sesión del TPV
             _currentSale = new Sale { Fecha = DateTime.UtcNow, Total = 0, Items = new List<SaleItem>() };
             
-            // Load initial data if needed (e.g. products for lookup)
+            // Cargamos los productos para poder buscarlos
             var productsList = _service.GetProducts();
             Products = new ObservableCollection<Product>(productsList);
             ProductsView = CollectionViewSource.GetDefaultView(Products);
@@ -43,7 +43,7 @@ namespace CommerceBoost.ViewModels
 
             UpdateSaleList();
 
-            // Initialize Commands
+            // Configuramos los comandos
             InitializeCommands();
         }
 
@@ -88,7 +88,7 @@ namespace CommerceBoost.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public event Action<List<SaleItem>>? OnSaleUpdated;
 
-        // Commands
+        // Comandos para las acciones del TPV
         public ICommand? NavigateInventoryCommand { get; private set; }
         public ICommand? NavigateSalesCommand { get; private set; }
         public ICommand? NavigateSettingsCommand { get; private set; }
@@ -152,7 +152,7 @@ namespace CommerceBoost.ViewModels
             }
         }
 
-        // --- Inventory Actions ---
+        // Acciones del inventario
         private bool FilterProducts(object item)
         {
             if (string.IsNullOrWhiteSpace(SearchText)) return true;
@@ -169,8 +169,7 @@ namespace CommerceBoost.ViewModels
             if (product == null) return;
             if (MessageBox.Show($"¿Estás seguro de eliminar '{product.Nombre}'?", "Confirmar Eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
-                // _service.DeleteProduct(product); // Assuming service has this method, if not we need to add it. 
-                // For now just remove from list to update UI
+                // Quitamos el producto de la lista para actualizar la interfaz
                 Products.Remove(product);
             }
         }
@@ -183,23 +182,23 @@ namespace CommerceBoost.ViewModels
 
         private void ScanNewInventoryProduct()
         {
-            // Simulate scanning a new product
+            // Simulamos escanear un producto nuevo
             var random = new Random();
             var newProduct = new Product
             {
-                // Id = Products.Count + 1, // Let DB handle ID if possible, or generate unique
+                // El ID lo genera la BD automáticamente
                 Codigo = random.Next(100000, 999999).ToString(),
                 Nombre = $"Producto Nuevo {random.Next(1, 100)}",
                 Precio = (decimal)(random.Next(100, 5000) / 100.0),
                 Stock = random.Next(10, 100)
             };
 
-            // Add to Database
+            // Lo guardamos en la base de datos
             try 
             {
                 _service.AddProduct(newProduct);
                 
-                // Add to UI List
+                // Lo añadimos a la lista de la interfaz
                 Products.Add(newProduct);
                 
                 MessageBox.Show($"Nuevo producto añadido al inventario y BD:\n\nCódigo: {newProduct.Codigo}\nNombre: {newProduct.Nombre}\nPrecio: {newProduct.Precio:C2}\nStock: {newProduct.Stock}", "Inventario Actualizado", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -210,10 +209,10 @@ namespace CommerceBoost.ViewModels
             }
         }
 
-        // --- Barcode Scanner Simulation ---
+        // Simulación del lector de códigos de barras
         private void ScanRandomProduct()
         {
-            // Get all products from database
+            // Cogemos todos los productos de la BD
             var allProducts = _service.GetProducts();
             if (allProducts == null || allProducts.Count == 0)
             {
@@ -221,18 +220,18 @@ namespace CommerceBoost.ViewModels
                 return;
             }
 
-            // Select random product
+            // Elegimos uno al azar
             var random = new Random();
             var randomProduct = allProducts[random.Next(allProducts.Count)];
 
-            // Parse quantity
+            // Parseamos la cantidad
             if (!int.TryParse(ScanQuantity, out int quantity) || quantity <= 0)
             {
                 MessageBox.Show("La cantidad debe ser un número mayor que 0.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // Add product to sale
+            // Añadimos el producto a la venta
             var newItem = new SaleItem
             {
                 ProductId = randomProduct.Id,
@@ -244,31 +243,31 @@ namespace CommerceBoost.ViewModels
             };
 
             _currentSale.Items.Add(newItem);
-            _selectedItem = newItem; // Auto-select the scanned item
+            _selectedItem = newItem; // Lo seleccionamos automáticamente
             
-            // Force UI update
+            // Actualizamos la interfaz
             Application.Current.Dispatcher.Invoke(() => 
             {
                 UpdateSaleList();
             });
 
-            // Reset quantity to 1 for next scan
+            // Reseteamos la cantidad a 1 para el siguiente escaneo
             ScanQuantity = "1";
         }
 
-        // --- Navigation / Views ---
-        // Simple navigation via events or properties. For now, we'll use an event to tell MainWindow to switch views.
+        // Navegación entre vistas
+        // Usamos eventos para que MainWindow cambie de vista
         public event Action<string>? RequestNavigation;
 
         public void AbrirInventario() => RequestNavigation?.Invoke("Inventory");
         public void AbrirVentas() => RequestNavigation?.Invoke("Sales");
         public void AbrirAjustes() => RequestNavigation?.Invoke("Settings");
 
-        // --- TPV Actions ---
+        // Acciones del TPV
 
         public void AgregarArticulo(string codigo)
         {
-            // Logic to find product by code and add to current sale
+            // Buscamos el producto por código y lo añadimos a la venta
             var product = _service.GetProductByCode(codigo);
             if (product != null)
             {
@@ -281,16 +280,16 @@ namespace CommerceBoost.ViewModels
                     TotalPrice = product.Precio
                 };
                 _currentSale.Items.Add(newItem);
-                _selectedItem = newItem; // Auto-select last added
+                _selectedItem = newItem; // Lo seleccionamos automáticamente
                 UpdateSaleList();
             }
         }
 
         public void BorrarArticulo(string codigo)
         {
-            // In a real app, 'codigo' might be the SaleItemId or ProductId
-            // For this demo, let's remove the selected item or find by code
-            var itemToRemove = _currentSale.Items.LastOrDefault(); // Simplification
+            // En una app real, 'codigo' podría ser el ID del artículo
+            // Por ahora, simplemente quitamos el último
+            var itemToRemove = _currentSale.Items.LastOrDefault(); // Simplificación
             if (itemToRemove != null)
             {
                 _currentSale.Items.Remove(itemToRemove);
@@ -300,7 +299,7 @@ namespace CommerceBoost.ViewModels
 
         public void SeleccionarArticulo(string codigo)
         {
-            // Find item by Product Code
+            // Buscamos el artículo por código de producto
             _selectedItem = _currentSale.Items.FirstOrDefault(i => i.Product.Codigo == codigo);
         }
 
@@ -312,13 +311,9 @@ namespace CommerceBoost.ViewModels
                 {
                    if (EditingProperty == "UnitPrice")
                    {
-                       string sPrice = _selectedItem.UnitPrice.ToString("0.00"); // Format to keep decimals? Or just raw string?
-                       // Better approach: treat as string input logic
-                       // But UnitPrice is decimal. Let's assume user types like a calculator.
-                       // Actually, simpler: just manipulate the value as string if possible, or reset.
-                       // Let's try to just remove last char from string representation, but that's tricky with formatting.
-                       // Simpler: Reset to 0 if backspace on full value, or implement string buffer.
-                       // For now, let's just set to 0 if backspace.
+                       string sPrice = _selectedItem.UnitPrice.ToString("0.00");
+                       // Mejor tratar el precio como texto para poder editarlo
+                       // Pero como es decimal, lo más simple es resetearlo
                        _selectedItem.UnitPrice = 0;
                    }
                    else // Quantity
@@ -379,7 +374,7 @@ namespace CommerceBoost.ViewModels
             }
             else
             {
-                // Modify scan buffer
+                // Modificamos el buffer de escaneo
                 if ((ScanQuantity == "1" || ScanQuantity == "0") && input != ".")
                 {
                     ScanQuantity = input;
@@ -396,7 +391,7 @@ namespace CommerceBoost.ViewModels
             item.TotalPrice = item.Quantity * (item.UnitPrice - item.Discount);
         }
 
-        // --- Inventory Actions ---
+        // Acciones del inventario
         public List<Product> GetInventory() => _service.GetProducts();
         
         public void AddProduct(Product p)
@@ -419,7 +414,7 @@ namespace CommerceBoost.ViewModels
             OnSaleUpdated?.Invoke(_currentSale.Items.ToList());
         }
 
-        // --- Footer Actions ---
+        // Acciones del pie de página (botones de cobro)
         public void CobrarDirecto() => FinalizarVenta("Efectivo");
         public void CobrarSinTicket() => FinalizarVenta("Sin Ticket");
         public void CobrarTarjeta() => FinalizarVenta("Tarjeta");
@@ -434,34 +429,34 @@ namespace CommerceBoost.ViewModels
 
             try
             {
-                // 1. Ensure Customer exists (Prevent FK Crash)
+                // 1. Nos aseguramos de que existe el cliente (para evitar errores de FK)
                 var customers = _service.GetCustomers();
                 if (!customers.Any(c => c.Id == 1))
                 {
                     _service.AddCustomer(new Customer { Id = 1, Name = "Cliente General", Email = "general@tienda.com" });
                 }
 
-                // 2. Prepare Sale
+                // 2. Preparamos la venta
                 _currentSale.Fecha = DateTime.UtcNow;
                 _currentSale.CustomerId = 1;
                 _currentSale.Total = _currentSale.Items.Sum(item => item.TotalPrice);
                 _currentSale.MetodoPago = metodoPago;
                 
-                // 3. Save to DB
+                // 3. Guardamos en la BD
                 _service.AddSale(_currentSale);
 
-                // 4. Update Stock
+                // 4. Actualizamos el stock
                 foreach (var item in _currentSale.Items)
                 {
                     _service.UpdateStock(item.ProductId, item.Quantity);
                 }
 
-                // 5. Generate JSON Ticket
+                // 5. Generamos el ticket en JSON
                 GenerateTicket(_currentSale, metodoPago);
 
-                // 6. Success & Reset
+                // 6. Todo OK, reseteamos la venta
                 var ticketId = _currentSale.Id;
-                // Sale completed silently - ticket printed
+                // Venta completada en silencio - ticket impreso
 
                 _currentSale = new Sale { Fecha = DateTime.UtcNow, Total = 0, Items = new List<SaleItem>() };
                 _selectedItem = null;
@@ -477,7 +472,7 @@ namespace CommerceBoost.ViewModels
         {
             var sb = new System.Text.StringBuilder();
             
-            // Header
+            // Cabecera
             sb.AppendLine("========================================");
             sb.AppendLine("     O ALMACEN DO CARNAVAL");
             sb.AppendLine("========================================");
@@ -488,11 +483,11 @@ namespace CommerceBoost.ViewModels
             sb.AppendLine("----------------------------------------");
             sb.AppendLine();
             
-            // Items header
+            // Cabecera de artículos
             sb.AppendLine("CANT  PRODUCTO              P.UNIT  TOTAL");
             sb.AppendLine("----------------------------------------");
             
-            // Items
+            // Artículos
             foreach (var item in sale.Items)
             {
                 string nombre = item.Product.Nombre.Length > 20 
@@ -503,7 +498,7 @@ namespace CommerceBoost.ViewModels
                 
                 sb.AppendLine($"{item.Quantity,4}  {nombre}  {precioFinal,6:F2}  {item.TotalPrice,6:F2}");
                 
-                // Show discount if applied
+                // Mostramos el descuento si se aplicó
                 if (item.Discount > 0)
                 {
                     sb.AppendLine($"      (Descuento: -{item.Discount:F2})");
@@ -513,7 +508,7 @@ namespace CommerceBoost.ViewModels
             sb.AppendLine("----------------------------------------");
             sb.AppendLine();
             
-            // Totals
+            // Totales
             decimal subtotal = sale.Items.Sum(i => i.Quantity * i.UnitPrice);
             decimal totalDescuentos = sale.Items.Sum(i => i.Quantity * i.Discount);
             
@@ -527,7 +522,7 @@ namespace CommerceBoost.ViewModels
             sb.AppendLine($"TOTAL:                       {sale.Total,8:F2}€");
             sb.AppendLine();
             
-            // Payment method specific message
+            // Mensaje según el método de pago
             if (metodoPago == "Efectivo")
             {
                 sb.AppendLine("*** PAGADO EN EFECTIVO ***");
@@ -543,7 +538,7 @@ namespace CommerceBoost.ViewModels
             sb.AppendLine("   Vuelva pronto");
             sb.AppendLine("========================================");
             
-            // Save to file
+            // Guardamos en archivo
             string folder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tickets");
             System.IO.Directory.CreateDirectory(folder);
             string filename = $"Ticket_{sale.Id:D6}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
@@ -552,43 +547,70 @@ namespace CommerceBoost.ViewModels
 
         public void ReimprimirTicket() 
         {
-            // Simulate reprinting last ticket
+            // Simulamos reimprimir el último ticket
             var lastSale = _service.GetSales().OrderByDescending(s => s.Fecha).FirstOrDefault();
             if (lastSale != null)
             {
-                // Reprint silently - would send to printer in production
+                // Reimprimimos en silencio - en producción iría a la impresora
                 GenerateTicket(lastSale, "Reimpresión");
             }
         }
 
         public void AbrirCajon()
         {
-            // Simulate opening cash drawer
-            // In production, this would send a signal to the cash drawer to open
+            // Simulamos abrir el cajón de efectivo
+            // En producción, esto enviaría una señal al cajón para abrirlo
             System.Diagnostics.Debug.WriteLine("Cash drawer opened");
         }
         
         public void AplicarDescuento() 
         {
-            if (_selectedItem == null)
+            // Verificamos que hay artículos en la venta
+            if (!_currentSale.Items.Any())
             {
-                MessageBox.Show("Selecciona un artículo para aplicar descuento.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("No hay artículos en la venta para aplicar descuento.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
-                var inputWin = new Views.InputWindow("Descuento", "Introduce porcentaje de descuento (%):");
+                // Determinamos el título y mensaje según si hay producto seleccionado
+                string title = _selectedItem != null ? "Descuento Artículo" : "Descuento Global";
+                string message = _selectedItem != null 
+                    ? "Introduce porcentaje de descuento para el artículo (%):" 
+                    : "Introduce porcentaje de descuento para TODOS los artículos (%):";
+
+                var inputWin = new Views.InputWindow(title, message);
                 inputWin.Owner = Application.Current.MainWindow;
+                
                 if (inputWin.ShowDialog() == true)
                 {
                     if (decimal.TryParse(inputWin.ResultText, out decimal discountPercent))
                     {
-                        decimal discountAmount = _selectedItem.UnitPrice * (discountPercent / 100m);
-                        _selectedItem.Discount = discountAmount;
+                        // Validamos que el porcentaje esté entre 0 y 100
+                        if (discountPercent < 0 || discountPercent > 100)
+                        {
+                            MessageBox.Show("El porcentaje debe estar entre 0 y 100.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
+                        if (_selectedItem != null)
+                        {
+                            // Descuento individual: solo al producto seleccionado
+                            decimal discountAmount = _selectedItem.UnitPrice * (discountPercent / 100m);
+                            _selectedItem.Discount = discountAmount;
+                        }
+                        else
+                        {
+                            // Descuento global: a todos los productos del ticket
+                            foreach (var item in _currentSale.Items)
+                            {
+                                decimal discountAmount = item.UnitPrice * (discountPercent / 100m);
+                                item.Discount = discountAmount;
+                            }
+                        }
                         
-                        // No need to call UpdateSaleList() - SaleItem implements INotifyPropertyChanged
-                        // Discount applied silently for speed
+                        // No hace falta llamar a UpdateSaleList() - SaleItem implementa INotifyPropertyChanged
                     }
                     else
                     {
@@ -612,7 +634,7 @@ namespace CommerceBoost.ViewModels
             }
             else if (_currentSale.Items.Any())
             {
-                // Remove last if none selected
+                // Si no hay nada seleccionado, quitamos el último
                 _currentSale.Items.RemoveAt(_currentSale.Items.Count - 1);
                 UpdateSaleList();
             }
@@ -629,7 +651,7 @@ namespace CommerceBoost.ViewModels
                 
                 if (product != null)
                 {
-                    int qty = int.Parse(ScanQuantity); // Use current numpad quantity
+                    int qty = int.Parse(ScanQuantity); // Usamos la cantidad actual del teclado
                     var newItem = new SaleItem
                     {
                         ProductId = product.Id,
@@ -642,9 +664,9 @@ namespace CommerceBoost.ViewModels
                     _currentSale.Items.Add(newItem);
                     _selectedItem = newItem;
                     UpdateSaleList();
-                    ScanQuantity = "1"; // Reset
+                    ScanQuantity = "1"; // Reseteamos
                 }
-                // Product not found - silently ignore for speed
+                // Producto no encontrado - lo ignoramos para ir rápido
             }
         }
 
@@ -663,7 +685,7 @@ namespace CommerceBoost.ViewModels
                     return;
                 }
 
-                // Calculate totals by payment method
+                // Calculamos totales por método de pago
                 var efectivoSales = sales.Where(s => s.MetodoPago == "Efectivo").ToList();
                 var tarjetaSales = sales.Where(s => s.MetodoPago == "Tarjeta").ToList();
                 var otrosSales = sales.Where(s => s.MetodoPago != "Efectivo" && s.MetodoPago != "Tarjeta").ToList();
@@ -673,7 +695,7 @@ namespace CommerceBoost.ViewModels
                 decimal totalOtros = otrosSales.Sum(s => s.Total);
                 decimal totalGeneral = sales.Sum(s => s.Total);
 
-                // Generate Z Report Ticket
+                // Generamos el ticket del cierre Z
                 var sb = new System.Text.StringBuilder();
                 
                 sb.AppendLine("========================================");
@@ -687,7 +709,7 @@ namespace CommerceBoost.ViewModels
                 sb.AppendLine("----------------------------------------");
                 sb.AppendLine();
                 
-                // Sales by payment method
+                // Ventas por método de pago
                 sb.AppendLine("DETALLE DE VENTAS:");
                 sb.AppendLine("----------------------------------------");
                 sb.AppendLine();
@@ -739,20 +761,20 @@ namespace CommerceBoost.ViewModels
                 sb.AppendLine("   Caja cerrada correctamente");
                 sb.AppendLine("========================================");
                 
-                // Save Z Report
+                // Guardamos el informe Z
                 string folder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tickets");
                 System.IO.Directory.CreateDirectory(folder);
                 string filename = $"CierreZ_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
                 System.IO.File.WriteAllText(System.IO.Path.Combine(folder, filename), sb.ToString());
                 
-                // Mark sales as Z-closed
+                // Marcamos las ventas como cerradas en Z
                 foreach (var sale in sales)
                 {
                     sale.ZClosed = true;
                 }
                 _service.UpdateSales(sales);
                 
-                // Refresh stats to show zero
+                // Actualizamos las estadísticas para que muestren cero
                 RefreshSalesStats();
                 
                 MessageBox.Show($"Cierre Z completado.\n\nTotal: {totalGeneral:C}\nTickets: {sales.Count}\n\nTicket guardado en carpeta Tickets", "Cierre Z", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -763,8 +785,8 @@ namespace CommerceBoost.ViewModels
             }
         }
 
-        // --- Reports ---
-        // --- Sales Stats & History ---
+        // Informes y estadísticas
+        // Estadísticas de ventas e historial
         private decimal _dailyTotal;
         public decimal DailyTotal
         {
@@ -803,7 +825,7 @@ namespace CommerceBoost.ViewModels
             var today = DateTime.UtcNow.Date;
             var sales = _service.GetSales();
             
-            // Only count sales that haven't been Z-closed
+            // Solo contamos las ventas que no se han cerrado en Z
             var openSales = sales.Where(s => !s.ZClosed).ToList();
             
             DailyTotal = openSales.Where(s => s.Fecha.Date == today).Sum(s => s.Total);

@@ -38,12 +38,11 @@ namespace CommerceBoost
         {
             await _host!.StartAsync();
 
-            // Ensure DB is created
+            // Nos aseguramos de que la base de datos existe
             using (var scope = _host.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<CommerceDbContext>();
-                // db.Database.EnsureCreated(); // Uncomment if you want auto-creation, but usually migrations are better. 
-                // For this project/user request, let's assume they might need it created if it doesn't exist.
+                // Intentamos crear la BD si no existe
                 try 
                 {
                    db.Database.EnsureCreated();

@@ -111,16 +111,16 @@ namespace CommerceBoost.Services
         {
             try
             {
-                // Fix missing Discount column in SaleItems
+                // Añadimos la columna Discount si no existe
                 _db.Database.ExecuteSqlRaw("ALTER TABLE \"SaleItems\" ADD COLUMN IF NOT EXISTS \"Discount\" numeric NOT NULL DEFAULT 0;");
                 
-                // Add MetodoPago and ZClosed columns to Sales
+                // Agregamos las columnas de método de pago y cierre Z
                 _db.Database.ExecuteSqlRaw("ALTER TABLE \"Sales\" ADD COLUMN IF NOT EXISTS \"MetodoPago\" text NOT NULL DEFAULT 'Efectivo';");
                 _db.Database.ExecuteSqlRaw("ALTER TABLE \"Sales\" ADD COLUMN IF NOT EXISTS \"ZClosed\" boolean NOT NULL DEFAULT false;");
             }
             catch (Exception ex)
             {
-                // Log or handle schema update errors
+                // Si algo falla, lo registramos en el debug
                 System.Diagnostics.Debug.WriteLine($"Schema update error: {ex.Message}");
             }
         }

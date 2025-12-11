@@ -38,7 +38,7 @@ namespace CommerceBoost.Views
             var random = new Random();
             ResultProduct = new Product
             {
-                Codigo = random.Next(100000, 999999).ToString(), // Auto-generate code for now
+                Codigo = random.Next(100000, 999999).ToString(), // Generamos el código automáticamente
                 Nombre = NombreBox.Text,
                 Precio = precio,
                 Stock = stock
